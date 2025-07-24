@@ -1,5 +1,6 @@
 /**/
-libname spr 'c:\ar\sas\sprat.';
+libname in 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\data\01_benchmark_2018';
+libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\03_benchmark_2018';
 
 proc format;
 
@@ -65,7 +66,7 @@ proc format;
 run;
 
 data nl1;
-set spr.norwegian_length_2017;
+set in.norwegian_length_2017;
 day=date-100*floor(date/100);
 month=(date-10000*floor(date/10000)-day)/100;
 year=floor(date/10000)+2000;
@@ -81,7 +82,7 @@ drop station date icessq scm total_number_length_class;
 run;
 
 data nl2;
-set spr.norwegian_alk_2017;
+set in.norwegian_alk_2017;
 day=date-100*floor(date/100);
 month=(date-10000*floor(date/10000)-day)/100;
 year=floor(date/10000)+2000;
@@ -97,7 +98,7 @@ drop station date icessq scm total_number_length_class noage0-noage3 noage4_ pro
 run;
 
 data in1;
-set spr.length_including_survey_2017 nl1 nl2;
+set in.length_including_survey_2017 nl1 nl2;
 
 if country ne 'NOR' then month=month(date);
 if country ne 'NOR' then day=day(date);
@@ -180,11 +181,11 @@ by year  quarter intsq;
 output out=l4 (drop=_type_ _freq_) n()=n_samples;
 run;
 
-data spr.n_samples;
+data out.n_samples;
 set l4; 
 run;
 
-proc summary data=spr.n_samples;
+proc summary data=out.n_samples;
 var n_samples;
 by year;
 output out=a2 sum()=n_samples;
@@ -269,12 +270,12 @@ proc sort data=l7;
 by year intsq quarter scm;
 run;
 
-proc sort data=spr.alk17_intsq_benchmark;
+proc sort data=out.alk17_intsq_benchmark;
 by year intsq quarter scm;
 run;
 
 data l8;
-merge l7 spr.alk17_intsq_benchmark;
+merge l7 out.alk17_intsq_benchmark;
 by year intsq quarter scm;
 run;
 
@@ -437,7 +438,7 @@ by quarter;
 run;
 
 data i1;
-set spr.new_sandeel_areas_incl_3a;
+set in.new_sandeel_areas_incl_3a;
 intsq='    ';
 intsq=square;
 keep intsq;
@@ -1015,7 +1016,7 @@ run;
 
 
 data m16;
-set spr.n_samples;
+set out.n_samples;
 *if year le 2014 then delete;
 run;
 
@@ -1034,24 +1035,24 @@ run;
 *if year ge 2016 then delete;
 *run;
 
-data spr.mean_weight_and_n_per_kg_bench;
+data out.mean_weight_and_n_per_kg_bench;
 set m17;
 if n_samples=. then n_samples=0;
 if n1_per_kg=. then delete;
 
 run;
 
-proc export data=spr.mean_weight_and_n_per_kg_bench
-   outfile='c:\ar\sprat\age_distributions\numbers_at_age_per_kg_and_mean_weight_2018_benchmark.csv'
+proc export data=out.mean_weight_and_n_per_kg_bench
+   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\03_benchmark_2018\numbers_at_age_per_kg_and_mean_weight_2018_benchmark.csv'
    dbms=csv 
    replace;
 run;
 quit;
-/*
-proc sort data=spr.mean_weight_and_n_per_kg_2017 out=m17;
+
+proc sort data=spr.mean_weight_and_n_per_kg_bench out=m17;
 by year quarter;
 run;
-*
+
 data m17a;
 set m17;
 if n_samples=0 then delete;
@@ -1102,7 +1103,7 @@ run;
 proc sort data=m18;
 by year quarter;
 run;
-*/
+
 data m19;
 set m18;
 *if samples le 5 then delete;
@@ -1118,7 +1119,7 @@ proc gplot data=m19;
 plot (n0_per_kg n1_per_kg n2_per_kg n3_per_kg n4_per_kg)*year/overlay;
 by quarter;
 run;
-/*
+
 data m19a;
 set m19;
 do age=0 to 4 by 1;
@@ -1175,7 +1176,7 @@ symbol3 v=2 i=r;
 symbol4 v=3 i=r;
 symbol5 v=4 i=r;
 run;
-*
+
 proc sort data=m19;
 by quarter;
 run;
