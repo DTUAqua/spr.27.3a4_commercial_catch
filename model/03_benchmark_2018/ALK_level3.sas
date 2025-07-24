@@ -3,7 +3,7 @@
 *****  Det følgende program kører på niveau 1 som %include statement i lgd age keys....sas****;
 
 data in5;
-set spr.in5;
+set out.in5;
 run;
 
 proc sort data=in5;
@@ -191,7 +191,7 @@ by age year quarter area3;
 *if year ge 2009 then delete;
 *run;
 
-data spr.alk_level3;
+data out.alk_level3;
 set aglg13c;* aglg13d;
 if maxp ge minp and minp gt 0.00001 then delete;
 if age=0 and maxp gt 0.9999 then delete;

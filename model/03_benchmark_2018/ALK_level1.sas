@@ -3,7 +3,7 @@
 *****  Det følgende program kører på niveau 1 som %include statement i square specific alk....sas****;
 
 data in5;
-set spr.in5;
+set out.in5;
 if area='' then delete;
 run;
 
@@ -192,7 +192,7 @@ by age year quarter area area2 area3;
 *if year ge 2009 then delete;
 *run;
 
-data spr.alk_level1;
+data out.alk_level1;
 set aglg13c;* aglg13d;
 if maxp ge minp and minp gt 0.00001 then delete;
 if age=0 and maxp gt 0.9999 then delete;

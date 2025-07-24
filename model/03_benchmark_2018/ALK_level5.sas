@@ -3,7 +3,7 @@
 *****  Det følgende program kører på niveau 1 som %include statement i lgd age keys....sas****;
 
 data in5;
-set spr.in5;
+set out.in5;
 if year=2009 and quarter le 2 then n2=.;
 if year=2009 and quarter le 2 then s2=.;
 if year=2009 and quarter le 2 then n3=.;
@@ -195,7 +195,7 @@ by age year area3;
 *if year ge 2009 then delete;
 *run;
 
-data spr.alk_level5;
+data out.alk_level5;
 set aglg13c;* aglg13d;
 pi=n/s;
 level=5;
