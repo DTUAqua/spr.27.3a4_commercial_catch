@@ -1,7 +1,8 @@
 /**/
-libname spr 'c:\ar\sas\sprat.';
+libname in 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\data\01_benchmark_2018';
+libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018';
 
-libname dis 'c:\ar\sas\coddist.';
+
 
 proc format;
 
@@ -70,7 +71,7 @@ run;
 ************Før 1982 bruges gennesmnitlig fordeling 1982-1988*******************************'******;
 
 data a01;
-set spr.Dk_spr_catch_82_88;
+set in.Dk_spr_catch_82_88;
 aar=year+1900;
 kv=quarter;
 if aar=1989 then delete;
@@ -96,7 +97,7 @@ end;
 run;
 
 data a1;
-set spr.Dk_spr_catch_82_88;
+set in.Dk_spr_catch_82_88;
 aar=year+1900;
 kv=quarter;
 if aar=1989 then delete;
@@ -105,19 +106,19 @@ sq=square;
 run;
 
 data a2a1;
-set spr.Havr89_og_frem_alle_arter17feb15;
+set in.Havr89_og_frem_alle_arter17feb15;
 if art not in ('BRS') then delete;
 if aar lt 2012 then delete;
 if aar gt 2013 then delete;
 run;
 
 data a2a2;
-set spr.dk_spr_catch_89_11;
+set in.dk_spr_catch_89_11;
 if aar ge 2012 then delete;
 run;
 
 data a2a3;
-set spr.Havr89_og_frem_alle_arter_2017;
+set in.Havr89_og_frem_alle_arter; *spr.Havr89_og_frem_alle_arter_2017 - den har jeg ikke;
 if art not in ('BRS') then delete;
 if aar lt 2014 then delete;
 run;
@@ -149,14 +150,14 @@ output out=t4x (drop=_type_ _freq_) sum()=;
 run;
 
 proc export data=a2a
-   outfile='c:\ar\sprat\age_distributions\danish_catches.csv'
+   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\danish_catches.csv'
    dbms=csv 
    replace;
 run;
 quit;
 
 data a2b;
-set spr.Catch_square_2002_2017_no_DK;
+set in.Catch_square_2002_2017_no_DK;
 intsq='    ';
 intsq=square;
 ton=catch_in_ton;
@@ -182,7 +183,7 @@ proc sort data=a2;
 by year quarter intsq;
 run;
 
-proc sort data=spr.mean_weight_and_n_per_kg_bench out=a3;
+proc sort data=out.mean_weight_and_n_per_kg_bench out=a3;
 by year quarter intsq;
 run;
 
@@ -271,7 +272,7 @@ output out=t4 (drop=_type_ _freq_) sum()=;
 run;
 
 data t5;
-set dis.sms_ns_2011;
+set in.sms_ns_2011;
 if species ne 'Sprat' then delete;
 sms_ton=yield__sop_;
 if year gt 1964 then delete;
@@ -288,7 +289,7 @@ output out=t6 (drop=_type_ _freq_) sum()=IV;
 run;
 
 data t7a;
-set t6 spr.ices_catch ;
+set t6 in.ices_catch ;
 if year lt 1965 then IV=IV/1000;
 if year ge 1966 then IV=IV+IIIa;
 run;
@@ -668,7 +669,7 @@ plot prop*year;
 run;
 
 data sms2;
-set dis.sms_ns_2011;
+set in.sms_ns_2011;
 if species ne 'Sprat' then delete;
 sms_ton=yield__sop_;
 sms_per_ton=c/sms_ton;
@@ -845,7 +846,7 @@ run;
 ****************Before 1974, there are no samples and SMS data are used*******************************;
 
 data s1;
-set dis.sms_ns_2011;
+set in.sms_ns_2011;
 if species ne 'Sprat' then delete;
 sms_ton=yield__sop_;
 sms_per_ton=c/sms_ton;
@@ -1145,7 +1146,7 @@ if div ne 'IV' then delete;
 run;
 
 proc export data=miv
-   outfile='c:\ar\sprat\age_distributions\Total_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv'
+   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\Total_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv'
    dbms=csv 
    replace;
 run;
@@ -1158,7 +1159,7 @@ if year lt 1974 then delete;
 run;
 
 proc export data=miiia
-   outfile='c:\ar\sprat\age_distributions\Total_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2.csv'
+   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\Total_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2.csv'
    dbms=csv 
    replace;
 run;
@@ -1304,7 +1305,7 @@ if div ne 'IV' then delete;
 run;
 
 proc export data=miv
-   outfile='c:\ar\sprat\age_distributions\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv'
+   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv'
    dbms=csv 
    replace;
 run;
@@ -1317,7 +1318,7 @@ if year lt 1974 then delete;
 run;
 
 proc export data=miiia
-   outfile='c:\ar\sprat\age_distributions\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2.csv'
+   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2.csv'
    dbms=csv 
    replace;
 run;
