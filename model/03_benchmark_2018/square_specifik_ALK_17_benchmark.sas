@@ -1,5 +1,7 @@
-/**
-libname spr 'c:\ar\sas\sprat.';
+
+libname in 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\data\03_benchmark_2018';
+libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\03_benchmark_2018';
+libname model 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\03_benchmark_2018';
 
 proc format;
 
@@ -65,7 +67,7 @@ proc format;
 run;
 
 data no1;
-set spr.norwegian_alk_2017;
+set in.norwegian_alk_2017;
 do age=0,1,2,3,4;
 output;
 end;
@@ -94,7 +96,7 @@ drop station date icessq sum;
 run;
 
 data in1;
-set spr.age_including_survey_2017 no2;
+set in.age_including_survey_2017 no2;
 n0=0;
 n1=0;
 n2=0;
@@ -154,12 +156,12 @@ var sampleid;
 by year quarter area3 area;
 output out=l4 (drop=_type_ _freq_) n()=n_samples;
 run;
-/*
-data spr.age_samples;
+
+data out.age_samples;
 set l4;
 run;
 
-proc summary data=spr.age_samples;
+proc summary data=out.age_samples;
 var n_samples;
 by year;
 output out=a2 sum()=n_samples;
@@ -262,7 +264,7 @@ run;
 proc sort data=in5;
 by year quarter area3 latlon age length;
 run;
-/*
+
 proc gplot data=in5;
 plot  (logit0-logit3)*length=quarter;
 by year ;
@@ -280,7 +282,7 @@ symbol11 v=triangle i=r c=black;
 symbol12 v=square i=r c=black;
 
 run;
-*
+
 proc sort data=in5;
 by year quarter area3 area area2  scm;
 run;
@@ -289,19 +291,19 @@ run;
 proc summary data=in5; 
 var n0-n4 s0-s4;
 by year quarter area3 area area2  scm;
-output out=spr.in5 sum()=;
+output out=out.in5 sum()=;
 run;
 
 *******  Det følgende program kører på flere niveauer (se note-dokument)  ****;
 
-%inc 'c:\ar\sas\sprat\alk\alk_level1.sas';
-%inc 'c:\ar\sas\sprat\alk\alk_level2.sas';
-%inc 'c:\ar\sas\sprat\alk\alk_level3.sas';
-%inc 'c:\ar\sas\sprat\alk\alk_level4.sas';
-%inc 'c:\ar\sas\sprat\alk\alk_level5.sas';
-*/
+%inc 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\03_benchmark_2018\alk_level1.sas';
+%inc 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\03_benchmark_2018\alk_level2.sas';
+%inc 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\03_benchmark_2018\alk_level3.sas';
+%inc 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\03_benchmark_2018\alk_level4.sas';
+%inc 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\03_benchmark_2018\alk_level5.sas';
+
 data l1;
-set spr.length;
+set in.length;
 month=month(date);
 day=day(date);
 intsq='    ';
@@ -379,7 +381,7 @@ by year quarter area3 area age scm;
 run;
 
 data l83a;
-set spr.alk_level1;
+set out.alk_level1;
 drop area2;
 run;
 
@@ -413,7 +415,7 @@ by year quarter area3 area2  age scm;
 run;
 
 data l84a;
-set spr.alk_level2;
+set out.alk_level2;
 run;
 
 proc sort data=l84a out=l84 (drop=pi level);
@@ -444,7 +446,7 @@ by year quarter area3 age scm;
 run;
 
 data l85a;
-set spr.alk_level3;
+set out.alk_level3;
 run;
 
 proc sort data=l85a out=l85 (drop=pi level);
@@ -479,7 +481,7 @@ proc sort data=l105;
 by year area3 hy age scm;
 run;
 
-proc sort data=spr.alk_level4 out=l86 (drop=pi level);
+proc sort data=out.alk_level4 out=l86 (drop=pi level);
 by year area3 hy age scm;
 run;
 
@@ -513,7 +515,7 @@ proc sort data=l106;
 by year area3 age scm;
 run;
 
-proc sort data=spr.alk_level5 out=l87 (drop=pi level);
+proc sort data=out.alk_level5 out=l87 (drop=pi level);
 by year area3 age scm;
 run;
 
@@ -615,7 +617,7 @@ run;
 *if year gt 2015 then delete;
 *run;
 
-data spr.alk17_intsq_benchmark;
+data out.alk17_intsq_benchmark;
 set l15 ;
 if intsq='' then delete;
 drop _type_ _freq_;
