@@ -337,6 +337,10 @@ f_levels_ALK <- function(pre_key, lvl, ages, tab_levels, vars_r, list_text, leve
   eval(parse(text=paste0("aglg1 <- pre_key %>% group_by (", vars, ", length ) %>%
                          summarize_at(.vars = vars(", paste(var_ns, collapse = ','), "), .funs = sum)")))
   
+  # aglg1 <- pre_key %>%
+  #   group_by_at(vars(one_of(c(trimws(unlist(strsplit(vars, ","))), "length")))) %>%
+  #   summarize_at(vars(one_of(var_ns)), sum)
+  
   # Delete when missing area or time (except first level where it has already been done)
   if(lvl != 1){
     for(v in 1:length(vars_r[[lvl]])){
@@ -461,6 +465,7 @@ f_levels_ALK <- function(pre_key, lvl, ages, tab_levels, vars_r, list_text, leve
   aglg13$sum[is.na(aglg13$n) == T] <- NA
   eval(parse(text=paste0("aglg13b <- aglg13 %>% group_by(age, ", vars, ") %>% summarise(prange = max(na.omit(prange)), 
                          minp = max(na.omit(minp)), maxp = max(na.omit(maxp)), sums = sum(s) , .groups = 'drop')")))
+  
   eval(parse(text=paste0( " aglg12 <- subset(aglg12, select = c(age,", vars,", length, minlgth, maxlgth, pred, n, s))")))
   
   aglg13b$minp[aglg13b$minp == '-Inf'] <- NA
