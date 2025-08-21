@@ -5,26 +5,26 @@
 #-------------------------------------------------------------------#
 #   1. LOAD functions
 #-------------------------------------------------------------------#
-source("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/functions/f_all_functions.R")
+source("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/model/00_old_r_script/f_all_functions.R")
 
 #-------------------------------------------------------------------#
 #   2. CREATION TABLES
 #-------------------------------------------------------------------#
 
 # Get Tables levels, space, time  
-list_areas <- read.csv("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/HAWG_sprat/input/sprat_areas.csv")
-list_areas <- select()
-source("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/HAWG_sprat/tables_levels_sprat.r")
+list_areas <- read.csv("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_old_r_scripts/sprat_areas.csv")
+# list_areas <- select()
+source("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/model/00_old_r_script/tables_levels_sprat.r")
 
 #-------------------------------------------------------------------#
 #   3. GET ALK
 #-------------------------------------------------------------------#
 
 # NWG data sprat
-rca_nwg <- read.csv("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/HAWG_sprat/input/2020/alk_samples_foreign_t_2019_2020.csv")
+rca_nwg <- read.csv("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_old_r_scripts/alk_samples_foreign_t_2019_2020.csv")
 
 # ALK function
-ALK_2019 <- f_compute_ALK(path_data = "Q:/dfad/users/kibi/data/RDB/RDB_in_csv/",
+ALK_2019 <- f_compute_ALK(path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_old_r_scripts/",
                                           data_rca = "rCA_2019.csv",
                                           data_rhh = "rHH_2019.csv",
                                           tab_levels = levels_table,
@@ -43,30 +43,30 @@ ALK_2019 <- f_compute_ALK(path_data = "Q:/dfad/users/kibi/data/RDB/RDB_in_csv/",
                                           length_obs = c(3,20),
                                           stratif = c(),
                                           return_graph = "Yes",
-                                          path_graph = "Q:\\dfad\\users\\anbes\\home\\Results\\ALK Graph sprat\\" )
+                                          path_graph = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/00_old_r_scripts/")
 
 saveRDS(ALK_2019$a2019, paste0("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/HAWG_sprat/output/2020/ALK_2019_", Sys.Date() ,".rds"))
 
-# path_data = "Q:/dfad/users/kibi/data/RDB/RDB_in_csv/"
-# data_rca = "rCA_2019.csv"
-# data_rhh = "rHH_2019.csv"
-# tab_levels = levels_table
-# tab_space = space_table
-# tab_time = time_table
-# space_first = "area1"
-# time_first = "quarter"
-# specie = 'Sprattus sprattus'
-# ages = c(0,4)
-# years = c(2019, 2019)
-# uncertainty = 0.5
-# min_sfish = 50
-# recruit_month = 3
-# type_length = "scm"
-# length_pred = c(1,20)
-# length_obs = c(3,30)
-# stratif = c()
-# return_graph = "Yes"
-# path_graph = "Q:\\dfad\\users\\anbes\\home\\Results\\ALK Graph sprat\\"
+path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_old_r_scripts/"
+data_rca = "rCA_2019.csv"
+data_rhh = "rHH_2019.csv"
+tab_levels = levels_table
+tab_space = space_table
+tab_time = time_table
+space_first = "area1"
+time_first = "quarter"
+specie = 'Sprattus sprattus'
+ages = c(0,4)
+years = c(2019, 2019)
+uncertainty = 0.5
+min_sfish = 50
+recruit_month = 3
+type_length = "scm"
+length_pred = c(1,20)
+length_obs = c(3,30)
+stratif = c()
+return_graph = "Yes"
+path_graph = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/00_old_r_scripts/"
 
 #-------------------------------------------------------------------#
 #   4. LENGTH DISTRIBUTION
