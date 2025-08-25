@@ -12,7 +12,7 @@ source("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_c
 #-------------------------------------------------------------------#
 
 # Get Tables levels, space, time  
-list_areas <- read.csv("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_old_r_scripts/sprat_areas.csv")
+list_areas <- read.csv("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/04_old_SAS_data_formatted_to_andreas_functions/sprat_areas.csv")
 # list_areas <- select()
 source("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/model/00_old_r_script/tables_levels_sprat.r")
 
@@ -21,12 +21,12 @@ source("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_c
 #-------------------------------------------------------------------#
 
 # NWG data sprat
-rca_nwg <- read.csv("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_old_r_scripts/alk_samples_foreign_t_2019_2020.csv")
+rca_nwg <- read.csv("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_inputs_to_andreas_functions/alk_samples_foreign_t_2019_2020.csv")
 
 # ALK function
-ALK_2019 <- f_compute_ALK(path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_old_r_scripts/",
-                                          data_rca = "rCA_2019.csv",
-                                          data_rhh = "rHH_2019.csv",
+ALK_2019 <- f_compute_ALK(path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/04_old_SAS_data_formatted_to_andreas_functions/",
+                                          data_rca = "dnk_ca.csv",
+                                          data_rhh = "dnk_hh.csv",
                                           tab_levels = levels_table,
                                           tab_space = space_table,
                                           tab_time = time_table,
@@ -34,7 +34,7 @@ ALK_2019 <- f_compute_ALK(path_data = "C:/Users/kibi/OneDrive - Danmarks Teknisk
                                           time_first = "quarter",
                                           specie = 'Sprattus sprattus',
                                           ages = c(0,4),
-                                          years = c(2019, 2019),
+                                          years = c(1974, 2017),
                                           uncertainty = 0.5,
                                           min_sfish = 50,
                                           recruit_month = 3,
@@ -47,9 +47,9 @@ ALK_2019 <- f_compute_ALK(path_data = "C:/Users/kibi/OneDrive - Danmarks Teknisk
 
 saveRDS(ALK_2019$a2019, paste0("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/HAWG_sprat/output/2020/ALK_2019_", Sys.Date() ,".rds"))
 
-path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_old_r_scripts/"
-data_rca = "rCA_2019.csv"
-data_rhh = "rHH_2019.csv"
+path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/04_old_SAS_data_formatted_to_andreas_functions/"
+data_rca = "dnk_ca.csv"
+data_rhh = "dnk_hh.csv"
 tab_levels = levels_table
 tab_space = space_table
 tab_time = time_table
@@ -57,7 +57,7 @@ space_first = "area1"
 time_first = "quarter"
 specie = 'Sprattus sprattus'
 ages = c(0,4)
-years = c(2019, 2019)
+years = c(1974, 2017)
 uncertainty = 0.5
 min_sfish = 50
 recruit_month = 3
