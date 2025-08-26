@@ -76,7 +76,7 @@ est_ALK <- function(path_data, data_rca, data_rhh, tab_levels, tab_space, tab_ti
   }
   if (length(stratif) == 0){
     # Sandeel preparation data
-    pre_key <- f_data_input_nostratif(path_data = path_data, 
+    pre_key <- alk_prepare_data_for_estimation(path_data = path_data, 
                                       data_rca = data_rca, 
                                       data_rhh = data_rhh,
                                       tab_space = tab_space, 
@@ -108,10 +108,19 @@ est_ALK <- function(path_data, data_rca, data_rhh, tab_levels, tab_space, tab_ti
                                     stratif = stratif)
   }
   
+  pre_key_sas <- haven::read_sas("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/01_benchmark_2018_2025_rerun/in5.sas7bdat")
+  
+  pre_key_sas <- dplyr::rename(pre_key_sas, length = scm, area1 = area)
+  pre_key_sas$halfyear <- 2
+  pre_key_sas$halfyear[pre_key_sas$quarter %in% c(1,2)] <- 1
+  
+  dplyr::distinct(pre_key, quarter, halfyear)
+  pre_key_sas <- select(pre_key_sas, -`_FREQ_`, -`_TYPE_`)
+  
   # ALK by level
   list_lvl <- list()
   for(l in levels[1]:levels[2]){
-    eval(parse(text=paste0('list_lvl$lv',l,'<- f_levels_ALK(pre_key = pre_key,
+    eval(parse(text=paste0('list_lvl$lv',l,'<- alk_estimate_per_level(pre_key = pre_key_sas,
                            lvl = ',l,', 
                            ages = ages, 
                            tab_levels = tab_levels, 
@@ -124,7 +133,7 @@ est_ALK <- function(path_data, data_rca, data_rhh, tab_levels, tab_space, tab_ti
   }
   
   if (length(stratif) == 0){
-    ALK <- f_ALK_nostrat(ages = ages, 
+    ALK <- alk_select(ages = ages, 
                          levels = levels, 
                          years = years, 
                          list_lvl =list_lvl, 
@@ -139,7 +148,7 @@ est_ALK <- function(path_data, data_rca, data_rhh, tab_levels, tab_space, tab_ti
                          aglg5 = aglg5)
     
     if(return_graph == "Yes"){
-      f_graph_nostrat(path_graph = path_graph, 
+      alk_plot(path_graph = path_graph, 
                       data_graph = ALK, 
                       years = years, 
                       ages = ages, 
