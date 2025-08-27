@@ -1,5 +1,4 @@
-
-estimate_alk_per_level <- function(pre_key, lvl, ages, tab_levels, vars_r, list_text, levels, space_first, uncertainty, min_sfish){
+alk_estimate_per_level <- function(pre_key, lvl, ages, tab_levels, vars_r, list_text, levels, space_first, uncertainty, min_sfish){
   vars <- tab_levels$vars[lvl]
   
   # Automatisation, to do sums for each age 
