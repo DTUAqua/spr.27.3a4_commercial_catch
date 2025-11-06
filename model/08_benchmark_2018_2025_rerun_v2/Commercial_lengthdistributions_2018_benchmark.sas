@@ -1,6 +1,6 @@
 /**/
 libname in 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\data\01_benchmark_2018_data';
-libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\07_benchmark_2018_2025_rerun_v1';
+libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\08_benchmark_2018_2025_rerun_v2';
 
 proc format;
 

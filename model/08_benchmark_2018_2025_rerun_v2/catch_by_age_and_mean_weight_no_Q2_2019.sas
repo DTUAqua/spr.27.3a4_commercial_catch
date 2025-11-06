@@ -1,6 +1,9 @@
 /**/
-libname in 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\data\01_benchmark_2018_2025_rerun';
-libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun';
+
+libname in 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\data\01_benchmark_2018_data';
+libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\08_benchmark_2018_2025_rerun_v2';
+
+%let path_output = C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\08_benchmark_2018_2025_rerun_v2;
 
 proc format;
 
@@ -148,7 +151,7 @@ output out=t4x (drop=_type_ _freq_) sum()=;
 run;
 
 proc export data=a2a
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\danish_catches.csv'
+   outfile= "&path_output\danish_catches.csv"
    dbms=csv 
    replace;
 run;
@@ -396,7 +399,7 @@ output out=cb12x sum()= ;
 run;
 
 proc export data=cb12x (drop= _type_ _freq_)
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\square_based_cathes.csv'
+   outfile= "&path_output\square_based_cathes.csv"
    dbms=csv 
    replace;
 run;
@@ -1315,7 +1318,7 @@ if div ne 'IV' then delete;
 run;
 
 proc export data=miv
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_IV.csv'
+   outfile= "&path_output\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_IV.csv"
    dbms=csv 
    replace;
 run;
@@ -1328,7 +1331,7 @@ if year lt 1974 then delete;
 run;
 
 proc export data=miiia
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_NO.csv'
+   outfile= "&path_output\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_NO.csv"
    dbms=csv 
    replace;
 run;
