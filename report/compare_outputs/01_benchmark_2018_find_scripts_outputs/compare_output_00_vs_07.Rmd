@@ -1,0 +1,85 @@
+---
+title: "compare_outputs"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, out.width = "150%", out.height = "200%")
+
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+path_1 <- "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/00_canum_weca_in_present_model/"
+path_2 <- "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/07_benchmark_2018_2025_rerun_v1/"
+
+file_2 <- "seasonal_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv"
+
+name_1 <- "present input"
+name_2 <- "2025 rerun v1"
+```
+
+# Canum
+
+```{r, include = F}
+canum_present <- read.csv(paste0(path_1, "canum.csv"), sep = ";", header = T)
+canum_present$type <- name_1
+canum_present_t <- gather(canum_present, key = age, value = no, , -year, -season, -type)
+canum_present_t$age <- substr(canum_present_t$age, 2, 2)
+
+canum <- read.csv(paste0(path_2, file_2), sep = ",")
+canum$season <- canum$quarter
+canum$type <- name_2
+names(canum)
+canum <- select(canum, year, season, type, n0, n1, n2, n3)
+canum_t <- gather(canum, key = age, value = no, , -year, -season, -type)
+canum_t$age <- substr(canum_t$age, 2, 2)
+
+
+comb <- bind_rows(canum_present_t, canum_t)
+```
+
+```{r, echo = F}
+
+ggplot(data = comb, aes(x = year, y = no, col = type)) +
+  # geom_bar(stat = "identity", position = "dodge") +
+  geom_line() +
+  facet_grid(age~season, scale = "free_y") +
+  labs(title = "Number at age per season and year") +
+    theme(legend.position="bottom")
+```
+
+# WECA
+
+```{r, include = F}
+canum_present <- read.csv(paste0(path_1, "weca.csv"), sep = ";", header = T)
+canum_present$type <- name_1
+canum_present_t <- gather(canum_present, key = age, value = mw, , -year, -season, -type)
+canum_present_t$age <- substr(canum_present_t$age, 3, 3)
+canum_present_t$season <- as.numeric(canum_present_t$season)
+canum_present_t$year <- as.numeric(canum_present_t$year)
+
+canum <- read.csv(paste0(path_2, file_2), sep = ",")
+canum$season <- canum$quarter
+canum$type <- name_2
+names(canum)
+canum <- select(canum, year, season, type, mw0, mw1, mw2, mw3)
+canum_t <- gather(canum, key = age, value = mw, , -year, -season, -type)
+canum_t$age <- substr(canum_t$age, 3, 3)
+
+
+comb <- bind_rows(canum_present_t, canum_t)
+```
+
+```{r, echo = F}
+
+ggplot(data = comb, aes(x = year, y = mw, col = type)) +
+  # geom_bar(stat = "identity", position = "dodge") +
+  geom_line() +
+  facet_grid(season~age, scale = "free_y") +
+  labs(title = "Mean weight at age per season and year") +
+    theme(legend.position="bottom")
+```
+
