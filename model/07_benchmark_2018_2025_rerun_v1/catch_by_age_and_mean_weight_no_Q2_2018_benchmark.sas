@@ -2,7 +2,7 @@
 libname in 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\data\01_benchmark_2018_data';
 libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\07_benchmark_2018_2025_rerun_v1';
 
-
+%let path_output = C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\07_benchmark_2018_2025_rerun_v1;
 
 proc format;
 
@@ -150,7 +150,7 @@ output out=t4x (drop=_type_ _freq_) sum()=;
 run;
 
 proc export data=a2a
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\danish_catches.csv'
+   outfile="&path_output\danish_catches.csv"
    dbms=csv 
    replace;
 run;
@@ -387,12 +387,12 @@ by div year ;
 output out=cb12x sum()=;
 run;
 
-*proc export data=cb12x
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\square_based_cathes.csv'
+proc export data=cb12x
+   outfile="&path_output\square_based_cathes.csv"
    dbms=csv 
    replace;
-*run;
-*quit;
+run;
+quit;
 
 proc summary data=cb11;
 var n0-n4 wmw0-wmw4 ton n_samples 
@@ -1146,7 +1146,7 @@ if div ne 'IV' then delete;
 run;
 
 proc export data=miv
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\Total_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv'
+   outfile="&path_output\Total_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv"
    dbms=csv 
    replace;
 run;
@@ -1159,7 +1159,7 @@ if year lt 1974 then delete;
 run;
 
 proc export data=miiia
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\Total_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2.csv'
+   outfile="&path_output\Total_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2.csv"
    dbms=csv 
    replace;
 run;
@@ -1305,7 +1305,7 @@ if div ne 'IV' then delete;
 run;
 
 proc export data=miv
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv'
+   outfile="&path_output\seasonal_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv"
    dbms=csv 
    replace;
 run;
@@ -1318,7 +1318,7 @@ if year lt 1974 then delete;
 run;
 
 proc export data=miiia
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2.csv'
+   outfile="&path_output\seasonal_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2.csv"
    dbms=csv 
    replace;
 run;
