@@ -1,0 +1,54 @@
+---
+title: "compare_ALKs_per_level"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+path <- "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/04_old_r_scripts_sas_data/"
+```
+
+
+```{r}
+
+load(paste0(path, "alk_74_17_with_year.RData"))
+load(paste0(path, "alk_74_17_no_year.RData"))
+load(paste0(path, "alk_74_17_no_prekey.RData"))
+load(paste0(path, "alk_74_17_no_rewrite.RData"))
+load(paste0(path, "alk_74_17_return.RData"))
+
+alk_74_17_with_year_df <- do.call(rbind, alk_74_17)
+alk_74_17_with_year_df <- as.data.frame(alk_74_17_with_year_df)
+alk_74_17_with_year_df <- dplyr::select(alk_74_17_with_year_df, -year)
+
+alk_74_17_no_year_df <- do.call(rbind, alk_74_17_no_year)
+alk_74_17_no_year_df <- as.data.frame(alk_74_17_no_year_df)
+
+no_diff <- identical(alk_74_17_no_year_df, alk_74_17_with_year_df)
+
+
+alk_74_17_with_year_df <- do.call(rbind, alk_74_17)
+alk_74_17_with_year_df <- as.data.frame(alk_74_17_with_year_df)
+
+alk_74_17_no_prekey_df <- do.call(rbind, alk_74_17_no_prekey)
+alk_74_17_no_prekey_df <- as.data.frame(alk_74_17_no_prekey_df)
+
+
+no_diff <- identical(alk_74_17_with_year_df, alk_74_17_no_prekey_df)
+
+
+alk_74_17_rewrite_df <- do.call(rbind, alk_74_17_rewrite)
+alk_74_17_rewrite_df <- as.data.frame(alk_74_17_rewrite_df)
+
+no_diff <- identical(alk_74_17_rewrite_df, alk_74_17_no_prekey_df)
+
+
+
+alk_74_17_return_df <- do.call(rbind, alk_74_17_return_alk)
+alk_74_17_return_df <- as.data.frame(alk_74_17_return_df)
+
+identical(alk_74_17_rewrite_df, alk_74_17_return_df)
+
+```
+

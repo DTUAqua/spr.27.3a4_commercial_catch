@@ -1,0 +1,177 @@
+---
+title: "Compare time series, WKSAND16 vs output from 2019"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: \today()
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(lubridate)
+library(tidyverse)
+
+options(scipen = 999)
+
+knitr::opts_chunk$set(echo = F,
+                      warning = F,
+                      message = F)
+
+scenario_new <- "WKSAND16"
+scenario_old <- "Output from 2019"
+
+path_data_new <-
+  paste0("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/HAWG_sandeel/2022/WKSANDEEL/output/", scenario_new, "/")
+
+path_data_old <-
+  paste0("M:/Tobis/Tobis_assessment/SMS_2019/Data/")
+
+file_name_new <- paste0("Total_catch_in_numbers_and_mean_weight_", scenario_new, ".csv")
+file_name_old <- paste0("Total_catch_in_numbers_and_mean_weight_dec_2018.csv")
+
+path_figures <-
+  paste0("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/HAWG_sandeel/2022/WKSANDEEL/output/graphic/new_vs_old_", 
+  scenario_new, "_compare_with_old_output/")
+
+dir.create(path_figures)
+
+knitr::opts_chunk$set(
+  echo = F,
+  warning = F,
+  message = F,
+  fig.width = 8,
+  fig.height = 5,
+  dpi = 900,
+  dev = 'jpeg',
+  results = 'asis',
+  fig.path = path_figures
+)
+
+col_area <- c(
+  "#1170aa",
+  "#c85200",
+  "#57606c",
+  "#a3cce9",
+  "#ffbc79"
+)
+
+```
+
+```{r}
+
+dat_new <- read.csv(paste0(path_data_new, file_name_new))
+names(dat_new)
+
+dat_new <- mutate(dat_new, scenario = scenario_new)
+
+dat_old <- read.csv(paste0(path_data_old, file_name_old))
+names(dat_old)
+
+dat_old <- mutate(dat_old, scenario = scenario_old, sopcorr = NA, area = Area)
+
+unique(dat_new$area)
+unique(dat_old$area)
+
+dat_old$area[dat_old$area %in% c(1, 2, 3, 5, 7)] <- paste0(dat_old$area[dat_old$area %in% c(1, 2, 3, 5, 7)], "r")
+unique(dat_old$area)
+
+dat <- rbind(dat_new, select(dat_old, -Area))
+
+names(dat)
+
+dat_n <- gather(select(dat, -mw0, -mw1, -mw2, -mw3, -mw4), key = age, value = number, -area, -aar, -hy, -n_samples, -sopcorr, -ton, -scenario)
+
+dat_n$age <- gsub("n", "", dat_n$age)
+
+dat_mw <- gather(select(dat, -n0, -n1, -n2, -n3, -n4), key = age, value = mean_weight, -area, -aar, -hy, -n_samples, -sopcorr, -ton, -scenario)
+
+dat_mw$age <- gsub("mw", "", dat_n$age)
+
+dat <- merge(dat_n , dat_mw)
+
+dat <- subset(dat, !is.na(area) & aar > 1982)
+
+```
+
+# Scenario - `r paste0(scenario_new, " vs ", scenario_old) ` 
+
+## SOP & mean weight
+
+
+```{r}
+
+
+fak <- as.factor(dat$area):as.factor(dat$hy)
+
+for (i in levels(fak)) {
+  
+  cat(paste0("### area:hy = ", i))
+  cat("  \n")
+  
+  dat_plot <- subset(dat, fak == i)
+  
+   p <- ggplot(subset(dat_plot), aes(x = aar, y = sopcorr, col = scenario, shape = scenario)) + 
+  geom_point()  + geom_line() +
+  scale_color_manual(values = col_area) +
+  theme(legend.position="bottom") +
+    labs(title = paste0("SOP per year per scenario, area:hy = ", i))
+  
+  print(p)
+  
+  
+  p <- ggplot(subset(dat_plot), aes(x = aar, y = mean_weight, col = age, shape = scenario, group=interaction(age, scenario))) + 
+  geom_point() + geom_line()  +
+  scale_color_manual(values = col_area) +
+  theme(legend.position="bottom") +
+    labs(title = paste0("Mean weight at age per year per scenario, area:hy = ", i))
+  
+  print(p)
+  
+   cat("\n\n\\pagebreak\n")
+  
+     
+  p <- ggplot(subset(dat_plot), aes(x = aar, y = number, col = age, shape = scenario, group=interaction(age, scenario))) + 
+  geom_point() + geom_line()  +
+  scale_color_manual(values = col_area) +
+  theme(legend.position="bottom") +
+    labs(title = paste0("Number at age per year per scenario, area:hy = ", i))
+  
+  print(p)
+  
+  p <-
+    ggplot(subset(dat_plot),
+           aes(
+             x = aar,
+             y = ton,
+             col = scenario,
+             shape = scenario
+           )) +
+    geom_point()  + geom_line() +
+    scale_color_manual(values = col_area) +
+    theme(legend.position = "bottom") +
+    labs(title = paste0("Tons per year per scenario, area:hy = ", i))
+  
+  print(p)
+  
+  cat("\n\n\\pagebreak\n")
+  
+  p <-
+    ggplot(subset(dat_plot),
+           aes(
+             x = aar,
+             y = n_samples,
+             col = scenario,
+             shape = scenario
+           )) +
+    geom_point() + geom_line()  +
+    scale_color_manual(values = col_area) +
+    theme(legend.position = "bottom") +
+    labs(title = paste0("Number of samples per year per scenario, area:hy = ", i))
+
+  print(p)
+
+  cat("\n\n\\pagebreak\n")
+  
+}
+
+
+```

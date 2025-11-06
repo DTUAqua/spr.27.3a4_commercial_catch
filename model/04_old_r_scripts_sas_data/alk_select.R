@@ -1,4 +1,4 @@
-select_alk <- function(ages, levels, years, areas, list_lvl, specie, length_pred, vars_r, tab_levels, tab_space, tab_time, space_first, time_first,
+alk_select <- function(ages, levels, years, areas, list_lvl, specie, length_pred, vars_r, tab_levels, tab_space, tab_time, space_first, time_first,
                           aglg5){
   
   # List to stock ALK of each year
@@ -99,7 +99,7 @@ select_alk <- function(ages, levels, years, areas, list_lvl, specie, length_pred
       eval(parse(text=paste0('l11$s_fish', a, '[is.na(l11$s_fish', a, ') == T] <- 0')))
     }
     # Attribute the level and probabilty to each combination
-    eval(parse(text=paste0("l12 <- l11 %>% group_by(rect, ", time_first, ", length) %>% 
+    eval(parse(text=paste0("l12 <- l11 %>% group_by(year, rect, ", time_first, ", length) %>% 
                            summarize_at(.vars = vars(", text_max, "), .funs = max)")))
     
     # Rep for each age : careful case where age_min = 0
@@ -174,7 +174,7 @@ select_alk <- function(ages, levels, years, areas, list_lvl, specie, length_pred
       }
     }
     
-    eval(parse(text=paste0("l14 <- l13 %>% group_by(rect, ", time_first, ", length) %>% 
+    eval(parse(text=paste0("l14 <- l13 %>% group_by(year, rect, ", time_first, ", length) %>% 
                            summarize_at(.vars = vars(", paste(paste(text_p, collapse = ", "), paste(text_l, collapse = ", "), 
                                                               paste(text_pi, collapse = ", "), paste(text_var, collapse = ", "),
                                                               paste(text_s_fish, collapse = ", "), sep = ", "), "), .funs = max)")))    

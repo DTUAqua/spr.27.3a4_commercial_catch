@@ -1,4 +1,3 @@
-
 alk_plot <- function(path_graph, data_graph, years, ages, tab_time, tab_levels, time_first){
   
   # Get time scale

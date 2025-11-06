@@ -1,7 +1,9 @@
 
-libname in 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\data\01_benchmark_2018_2025_rerun';
-libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun';
-libname model 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\01_benchmark_2018_2025_rerun';
+libname in 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\data\01_benchmark_2018_data';
+libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\07_benchmark_2018_2025_rerun_v1';
+libname model 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\07_benchmark_2018_2025_rerun_v1';
+
+%let path_model = C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\07_benchmark_2018_2025_rerun_v1;
 
 proc format;
 
@@ -296,11 +298,11 @@ run;
 
 *******  Det følgende program kører på flere niveauer (se note-dokument)  ****;
 
-%inc 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\01_benchmark_2018_2025_rerun\alk_level1.sas';
-%inc 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\01_benchmark_2018_2025_rerun\alk_level2.sas';
-%inc 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\01_benchmark_2018_2025_rerun\alk_level3.sas';
-%inc 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\01_benchmark_2018_2025_rerun\alk_level4.sas';
-%inc 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\model\01_benchmark_2018_2025_rerun\alk_level5.sas';
+%inc "&path_model\alk_level1.sas";
+%inc "&path_model\alk_level2.sas";
+%inc "&path_model\alk_level3.sas";
+%inc "&path_model\alk_level4.sas";
+%inc "&path_model\alk_level5.sas";
 
 data l1;
 set in.length;

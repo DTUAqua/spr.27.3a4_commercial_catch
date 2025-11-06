@@ -1,0 +1,86 @@
+---
+title: "compare_ALKs_per_level"
+author: "Kirsten Birch Håkansson, DTU Aqua"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+library(dplyr)
+library(ggplot2)
+
+path_r <- "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/04_old_r_scripts_sas_data/"
+
+path_sas <- "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/01_benchmark_2018_2025_rerun/"
+```
+
+
+```{r}
+load(paste0(path_r, "alk_74_17_length_alk.RData"))
+
+alk_74_17_length_df <- do.call(rbind, alk_74_17_length_alk)
+r <- as.data.frame(alk_74_17_length_df)
+
+sas <- haven::read_sas(paste0(path_sas, "alk17_intsq_benchmark.sas7bdat"))
+sas$rect <- sas$intsq
+sas$length <- sas$scm
+sas$id <- row.names(sas)
+
+```
+
+```{r}
+
+names(r)
+names(sas)
+
+# There is something wrong with the list of square, so these are not completly the same in the two files
+# comb <- full_join(sas, r, by = c("year", "rect", "quarter", "length"))
+# 
+# id_sum <- summarise(group_by(comb, year, rect, quarter, length, id), no = length(id))
+# 
+# id_sum_gt_1 <- subset(id_sum, no > 1)
+# id_sum_na <- subset(id_sum, is.na(id))
+# 
+# table(id_sum_na$year, id_sum_na$rect)
+
+comb <- inner_join(sas, r, by = c("year", "rect", "quarter", "length"))
+comb$id <- row.names(comb)
+```
+
+```{r}
+# Compare levels
+
+l0_diff <- subset(comb, l0.x != l0.y)
+l1_diff <- subset(comb, l1.x != l1.y)
+l2_diff <- subset(comb, l2.x != l2.y)
+l3_diff <- subset(comb, l3.x != l3.y)
+l4_diff <- subset(comb, l4.x != l4.y)
+
+# No difference in levels and p rounded to 3 digits - that is 84% of the cases
+no_diff <- subset(comb, l0.x == l0.y & round(p0.x, digits = 3) == round(p0.y, digits = 3) &
+                    l1.x == l1.y & round(p1.x, digits = 3) == round(p1.y, digits = 3) &
+                    l2.x == l2.y & round(p2.x, digits = 3) == round(p2.y, digits = 3) &
+                    l3.x == l3.y & round(p3.x, digits = 3) == round(p3.y, digits = 3) &
+                    round(p4.x, digits = 3) == round(p4.y, digits = 3))
+
+nrow(no_diff)/nrow(comb)
+
+diff <- subset(comb, round(p0.x, digits = 3) != round(p0.y, digits = 3) |
+                    round(p1.x, digits = 3) != round(p1.y, digits = 3) |
+                    round(p2.x, digits = 3) != round(p2.y, digits = 3) |
+                    round(p3.x, digits = 3) != round(p3.y, digits = 3) |
+                    round(p4.x, digits = 3) != round(p4.y, digits = 3))
+
+# No level selected
+no_lvl <- subset(comb, (l0.y == 0 |
+                   l1.y == 0 |
+                   l2.y == 0 |
+                   l3.y == 0) & (
+                   !(is.na(l0.x)) |
+                   !(is.na(l1.x)) |
+                   !(is.na(l2.x)) |
+                   !(is.na(l3.x))))
+
+```
+

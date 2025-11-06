@@ -5,11 +5,7 @@
 #-------------------------------------------------------------------#
 #   1. LOAD functions
 #-------------------------------------------------------------------#
-
-script_path <- "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/model/04_old_r_scripts_sas_data"
-
-scripts <- list.files(path = script_path, pattern = "alk_", full.names = TRUE)
-for (f in scripts) source(f)
+source("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/model/00_old_r_script/f_all_functions.R")
 
 #-------------------------------------------------------------------#
 #   2. CREATION TABLES
@@ -18,7 +14,7 @@ for (f in scripts) source(f)
 # Get Tables levels, space, time  
 list_areas <- read.csv("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/04_old_SAS_data_formatted_to_andreas_functions/sprat_areas.csv")
 # list_areas <- select()
-source("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/model/04_old_r_scripts_sas_data/tables_levels_sprat.r")
+source("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/model/00_old_r_script/tables_levels_sprat.r")
 
 #-------------------------------------------------------------------#
 #   3. GET ALK
@@ -28,7 +24,7 @@ source("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_c
 rca_nwg <- read.csv("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_inputs_to_andreas_functions/alk_samples_foreign_t_2019_2020.csv")
 
 # ALK function
-alk_74_17 <- alk_estimate(path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_inputs_to_andreas_functions/",
+alk_no_year <- f_compute_ALK(path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/04_old_SAS_data_formatted_to_andreas_functions/",
                                           data_rca = "rCA_2019.csv",
                                           data_rhh = "rHH_2019.csv",
                                           tab_levels = levels_table,
@@ -47,13 +43,13 @@ alk_74_17 <- alk_estimate(path_data = "C:/Users/kibi/OneDrive - Danmarks Teknisk
                                           length_obs = c(3,20),
                                           stratif = c(),
                                           return_graph = "Yes",
-                                          path_graph = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/04_old_r_scripts_sas_data/")
+                                          path_graph = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/00_old_r_scripts/")
 
-saveRDS(alk_74_17, paste0("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/04_old_r_scripts_sas_data/alk_74_17_with_year", Sys.Date() ,".Rdata"))
+saveRDS(ALK_2019$a2019, paste0("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/HAWG_sprat/output/2020/ALK_2019_", Sys.Date() ,".rds"))
 
-path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_inputs_to_andreas_functions/"
-data_rca = "rCA_2019.csv"
-data_rhh = "rHH_2019.csv"
+path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/04_old_SAS_data_formatted_to_andreas_functions/"
+data_rca = "dnk_ca.csv"
+data_rhh = "dnk_hh.csv"
 tab_levels = levels_table
 tab_space = space_table
 tab_time = time_table
@@ -61,7 +57,7 @@ space_first = "area1"
 time_first = "quarter"
 specie = 'Sprattus sprattus'
 ages = c(0,4)
-years = c(2017, 2017)
+years = c(1974, 2017)
 uncertainty = 0.5
 min_sfish = 50
 recruit_month = 3
@@ -70,15 +66,15 @@ length_pred = c(1,20)
 length_obs = c(3,30)
 stratif = c()
 return_graph = "Yes"
-path_graph = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/04_old_r_scripts_sas_data/"
+path_graph = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/00_old_r_scripts/"
 
 #-------------------------------------------------------------------#
 #   4. LENGTH DISTRIBUTION
 #-------------------------------------------------------------------#
 
-scripts <- list.files(path = script_path, pattern = "f_length_distri_sprat", full.names = TRUE)
-for (f in scripts) source(f)
-
+# NWG data sprat
+# nwg_sprat <- read.csv("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/HAWG_sprat/input/2020/ld_samples_foreign_2019_2020.csv")
+source("Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/functions/f_length_distri_sprat.R")
 # Function
 length_distri_sprat <- f_length_distri(path_data = "Q:/mynd/Assessement_discard_and_the_like/assessment_scripts/HAWG_sprat/input/2020/",
                                          data_all = "ld_samples_input_2019_2020.csv",
@@ -111,25 +107,26 @@ ggplot(ld, aes(x = length, y = number, col = staNum)) +
   geom_bar(stat = "identity") + 
   theme(legend.position = "none")
 
-load(paste0("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/04_old_r_scripts_sas_data/alk_74_17_length_alk.Rdata"))
 
-data_all <- haven::read_sas("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/01_benchmark_2018_2025_rerun/l1.sas7bdat")
-
-path_data = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/data/00_inputs_to_andreas_functions/"
-data_all = data_all
-data_ALK = alk_74_17_length_alk
-path_graph = "C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/04_old_r_scripts_sas_data/"
-tab_levels = levels_table
-tab_time = time_table
-tab_space = space_table
-species = c("Sprattus sprattus")
-specie = "Sprattus sprattus"
-years = c(1974:2017)
-type_length = "scm"
-ages = c(0,4)
-space_first = "area1"
-time_first = "quarter"
-min_nsamples = 5
+# path_data = "Q:/dfad/users/kibi/data/RDB/RDB_in_csv/"
+# data_rca = "rCA_2020.csv"
+# data_rhh = "rHH_2020.csv"
+# data_rhl = "rHL_2020.csv"
+# data_rsl = "rSL_2020.csv"
+# data_nwg = nwg_sprat
+# data_ALK = ALK_2020
+# path_graph = "Q:\\dfad\\users\\anbes\\home\\Results\\Length distribution sprat\\Sprat 2016 RDB\\"
+# tab_levels = levels_table
+# tab_time = time_table
+# tab_space = space_table
+# species = c("Sprattus sprattus")
+# specie = "Sprattus sprattus"
+# years = c(2020, 2020)
+# type_length = "scm"
+# ages = c(0,4)
+# space_first = "area1"
+# time_first = "quarter"
+# min_nsamples = 5
 
 
 #-------------------------------------------------------------------#

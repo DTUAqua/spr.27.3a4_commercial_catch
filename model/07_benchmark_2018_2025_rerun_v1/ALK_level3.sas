@@ -4,19 +4,15 @@
 
 data in5;
 set out.in5;
-if year=2009 and quarter le 2 then n2=.;
-if year=2009 and quarter le 2 then s2=.;
-if year=2009 and quarter le 2 then n3=.;
-if year=2009 and quarter le 2 then s3=.;
 run;
 
 proc sort data=in5;
-by year area3 scm;
+by year quarter area3 scm;
 run;
 
 proc summary data=in5;
 var n0-n4 s0-s4;            
-by year area3 scm;
+by year quarter area3 scm;
 output out=aglg5a sum()=;
 run;
 
@@ -65,7 +61,7 @@ symbol6 v=plus i=join c=red;
 run;
 */
 proc sort data=aglg7;
-by year area3 age;
+by year quarter area3 age;
 run;
 
 *Antal fisk i aldersgruppen i alt i hver kombination af område, år, måned og geartype beregnes
@@ -82,7 +78,7 @@ run;
 
 proc summary data=aglg71;
 var n s;
-by year area3 age;
+by year quarter area3 age;
 output out=aglg7aa sum(n)=nage sum(s)=means n(n)=nlengths;
 run;
 
@@ -97,20 +93,20 @@ run;
 
 proc summary data=aglg7a2;
 var scm;
-by year area3 age;
+by year quarter area3 age;
 output out=aglg7b max()=maxscm min()=minscm;
 run;
 
 data aglg8;
 merge aglg7 aglg7aa aglg7b;
-by year area3 age;
+by year quarter area3 age;
 run;
 
 data aglg8b;
 set aglg8;
-*if means lt 10 and maxscm ne . then delete; **Bibeholder tilfælde hvor flere end 10 fisk  
+if means lt 10 and maxscm ne . then delete; **Bibeholder tilfælde hvor flere end 10 fisk  
 er aldersbestemt men ingen var den pågældende alder**;
-*if nlengths le 1 then delete;
+if nlengths le 1 then delete;
 **********Alle fisk mere end to størrelseskategorier udenfor det observerede max og min 
 (alle 0 eller 1-p-er) slettes da modellen ikke kan lide for mange 0-p'er og 1-p'er *********;
 if maxscm ne . and maxscm lt 18 and scm gt maxscm+2 then n=.;
@@ -150,11 +146,7 @@ drop _type_ _freq_;
 run;
 
 proc sort data=aglg9;
-by age year area3 maxscm minscm;
-run;
-
-data out.aglg9;
-set aglg9; 
+by age year quarter area3 maxscm minscm;
 run;
 
 *NB! ved at anvende n/s i stedet for pi indgår antallet af fisk som vægtning, hvis pi anvendes skal der tilføjes et weight statement;
@@ -164,12 +156,12 @@ proc genmod data=aglg9;          *model til generering af datasæt;
 model n/s=scm
 /dist=bin link=logit type1 type3 pscale obstats;
 make 'obstats' out=aglg12;
-by age year area3 maxscm minscm;
+by age year quarter area3 maxscm minscm;
 run;
 
 *******Deleting samples were the probability at maxsize exceeds that at minsize***;
 proc sort data=aglg12;
-by age year area3;
+by age year quarter area3;
 run;
 
 
@@ -185,13 +177,13 @@ run;
 
 proc summary data=aglg13;
 var minp maxp prange sum;
-by age year area3;
+by age year quarter area3;
 output out=aglg13b max()= sum(s)=sums;
 run;
 
 data aglg13c;
  merge aglg12 aglg13b;
-by age year area3;
+by age year quarter area3;
  run;
 
 *data aglg13d;
@@ -199,11 +191,14 @@ by age year area3;
 *if year ge 2009 then delete;
 *run;
 
-data out.alk_level5;
+data out.alk_level3;
 set aglg13c;* aglg13d;
+if maxp ge minp and minp gt 0.00001 then delete;
+if age=0 and maxp gt 0.9999 then delete;
+*if aar ge 2009 and sums lt 50 and prange gt 0.5 then delete;
 pi=n/s;
-level=5;
-keep age year area3 maxp minp prange 
+level=3;
+keep age year quarter area3 maxp minp prange 
 level pred lower upper n s maxscm minscm scm pi;
 run;
 
@@ -216,8 +211,8 @@ run;
 *Plots of predictions and observed pi's ;
 /*
 
-proc sort data=spr.alk_level5 out=t1;
-by age year  scm;
+proc sort data=spr.alk_level3 out=t1;
+by age year quarter  scm;
 run;
 
 data t2;
@@ -234,7 +229,7 @@ title ' ';
 
 proc gplot data=t2;
 plot (pi pred lower upper)*scm/overlay; *pred er den prediktede værdi af pi eller n/s;
-by age year;
+by age year quarter ;
 symbol1 v=plus i=none c=bl;
 symbol2 v=none i=join l=1 c=bl;
 symbol3 v=none i=spline l=2 c=bl;
@@ -244,43 +239,14 @@ run;
 title ' ';
 
 proc gplot data=t2;
-plot pred*scm=year;
-by age ;
+plot pred*scm=quarter;
+by age year;
 symbol1 v=plus i=join c=blue;
-symbol2 v=plus i=join c=blue;
-symbol3 v=plus i=join c=blue;
-symbol4 v=plus i=join c=blue;
-symbol5 v=plus i=join c=blue;
-symbol6 v=plus i=join c=green;
-symbol7 v=plus i=join c=green;
-symbol8 v=plus i=join c=green;
-symbol9 v=plus i=join c=green;
-symbol10 v=plus i=join c=green;
-symbol11 v=plus i=join c=yellow;
-symbol12 v=plus i=join c=yellow;
-symbol13 v=plus i=join c=yellow;
-symbol14 v=plus i=join c=yellow;
-symbol15 v=plus i=join c=yellow;
-symbol16 v=plus i=join c=orange;
-symbol17 v=plus i=join c=orange;
-symbol18 v=plus i=join c=orange;
-symbol19 v=plus i=join c=orange;
-symbol20 v=plus i=join c=orange;
-symbol21 v=plus i=join c=red;
-symbol22 v=plus i=join c=red;
-symbol23 v=plus i=join c=red;
-symbol24 v=plus i=join c=red;
-symbol25 v=plus i=join c=red;
-symbol26 v=plus i=join c=brown;
-symbol27 v=plus i=join c=brown;
-symbol28 v=plus i=join c=brown;
-symbol29 v=plus i=join c=brown;
-symbol30 v=plus i=join c=brown;
-symbol31 v=plus i=join c=black;
-symbol32 v=plus i=join c=black;
-symbol33 v=plus i=join c=black;
-symbol34 v=plus i=join c=black;
-symbol35 v=plus i=join c=black;
+symbol2 v=plus i=join c=red;
+symbol3 v=plus i=join c=green;
+symbol4 v=plus i=join c=orange;
+symbol5 v=plus i=join c=brown;
+symbol6 v=plus i=join c=red;
 run;
 quit;
 */

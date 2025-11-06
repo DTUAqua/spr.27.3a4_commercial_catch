@@ -2,8 +2,6 @@
 libname in 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\data\01_benchmark_2018_2025_rerun';
 libname out 'C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun';
 
-
-
 proc format;
 
    VALUE $ibts
@@ -106,7 +104,7 @@ sq=square;
 run;
 
 data a2a1;
-set in.Havr89_og_frem_alle_arter17feb15;
+set in.Havr89_og_frem_alle_arter;
 if art not in ('BRS') then delete;
 if aar lt 2012 then delete;
 if aar gt 2013 then delete;
@@ -118,7 +116,7 @@ if aar ge 2012 then delete;
 run;
 
 data a2a3;
-set in.Havr89_og_frem_alle_arter; *spr.Havr89_og_frem_alle_arter_2017 - den har jeg ikke;
+set in.Havr89_og_frem_alle_arter;
 if art not in ('BRS') then delete;
 if aar lt 2014 then delete;
 run;
@@ -150,7 +148,7 @@ output out=t4x (drop=_type_ _freq_) sum()=;
 run;
 
 proc export data=a2a
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\danish_catches.csv'
+   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\danish_catches.csv'
    dbms=csv 
    replace;
 run;
@@ -161,7 +159,11 @@ set in.Catch_square_2002_2017_no_DK;
 intsq='    ';
 intsq=square;
 ton=catch_in_ton;
-if country='DEN' then delete;
+if country='DEN' and year lt 2019 then delete;
+****************REMOVE IN 2021************************;
+****************Temporary fix for low catches and no samples**********;
+if year=2020 and quarter=1 then quarter=4;
+if year=2020 then year=2019;
 run;
 
 data a2c;
@@ -208,7 +210,7 @@ run;
 *run;
 
 *proc export data=x4a
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\quarterly_catches.csv'
+   outfile='C:\ar\sprat\age_distributions\quarterly_catches.csv'
    dbms=csv 
    replace;
 *run;
@@ -233,7 +235,7 @@ run;
 *run;
 
 *proc export data=x7
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\correlation_n_samples_ton.csv'
+   outfile='C:\ar\sprat\age_distributions\correlation_n_samples_ton.csv'
    dbms=csv 
    replace;
 *run;
@@ -257,7 +259,8 @@ div='    ';
 div='IV';
 *if roundfish in ('8','9') then div='IIIa';
 
-if intsq in ('45F7', '45F8', '46F8', '46F9', '47F9', '46G0', '47G0', '48G0', '47G1') then div='NO';
+if intsq in ('45F7', '45F8', '46F8', '46F9', '47F9', '46G0', '47G0', '48G0', '47G1') 
+then div='NO';
 
 run;
 
@@ -289,7 +292,7 @@ output out=t6 (drop=_type_ _freq_) sum()=IV;
 run;
 
 data t7a;
-set t6 in.ices_catch ;
+set t6 in.ices_catch;
 if year lt 1965 then IV=IV/1000;
 if year ge 1966 then IV=IV+IIIa;
 run;
@@ -317,6 +320,11 @@ if year=2016 then IV=240.673+8.204;
 
 if year=2017 then IV=128.660+1.418;
 
+if year=2018 then IV=187.216+3.969;
+if year=2019 then IV=23.386+123.082+0.683;
+
+****************REMOVE 683 t from 2019 IN 2021************************;
+****************Temporary fix for low catches and no samples**********;
 
 if div='IV' then faktorIV=1000*IV/ton;
 if div='NO' then faktorNO=1;
@@ -383,22 +391,22 @@ run;
 
 proc summary data=cb11x;
 var ton n_samples;
-by div year ;
-output out=cb12x sum()=;
+by div year intsq;
+output out=cb12x sum()= ;
 run;
 
-*proc export data=cb12x
+proc export data=cb12x (drop= _type_ _freq_)
    outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\square_based_cathes.csv'
    dbms=csv 
    replace;
-*run;
-*quit;
+run;
+quit;
 
 proc summary data=cb11;
 var n0-n4 wmw0-wmw4 ton n_samples 
 ;
 by year quarter div;
-output out=cb12 sum()=;
+output out=cb12 sum()= mean(wmw0)=w2mw0 mean(wmw1)=w2mw1 mean(wmw2)=w2mw2 mean(wmw3)=w2mw3 mean(wmw4)=w2mw4;
 run;
 
 data cb13;
@@ -408,11 +416,11 @@ mw1=wmw1/n1;
 mw2=wmw2/n2;
 mw3=wmw3/n3;
 mw4=wmw4/n4;
-if quarter=2 then mw0=wmw0;
-if quarter=2 then mw1=wmw1;
-if quarter=2 then mw2=wmw2;
-if quarter=2 then mw3=wmw3;
-if quarter=2 then mw4=wmw4;
+if quarter=2 then mw0=w2mw0;
+if quarter=2 then mw1=w2mw1;
+if quarter=2 then mw2=w2mw2;
+if quarter=2 then mw3=w2mw3;
+if quarter=2 then mw4=w2mw4;
 
 *keep aar area ton n0-n4 mw0-mw4 n_samples;
 run;
@@ -425,7 +433,7 @@ run;
 
 data m15a;
 set m14;
-do year=1974 to 2017 by 1;
+do year=1974 to 2020 by 1;
 output;
 end;
 run;
@@ -585,7 +593,7 @@ run;
 
 
 *proc export data=m24
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\catch_ratio_consistency.csv'
+   outfile='C:\ar\sprat\age_distributions\catch_ratio_consistency.csv'
    dbms=csv 
    replace;
 *run;
@@ -617,7 +625,7 @@ if _name_ ne 'ratio' then delete;
 run;
 
 *proc export data=m24b
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\ratio_lag_correlations.csv'
+   outfile='C:\ar\sprat\age_distributions\ratio_lag_correlations.csv'
    dbms=csv 
    replace;
 *run;
@@ -669,7 +677,7 @@ plot prop*year;
 run;
 
 data sms2;
-set in.sms_ns_2011;
+set dis.sms_ns_2011;
 if species ne 'Sprat' then delete;
 sms_ton=yield__sop_;
 sms_per_ton=c/sms_ton;
@@ -776,7 +784,7 @@ run;
 
 
 *proc export data=m24
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\catch_ratio_consistency.csv'
+   outfile='C:\ar\sprat\age_distributions\catch_ratio_consistency.csv'
    dbms=csv 
    replace;
 *run;
@@ -813,7 +821,7 @@ if _name_ ne 'ratio' then delete;
 run;
 
 *proc export data=m24b
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\ratio_lag_correlations.csv'
+   outfile='C:\ar\sprat\age_distributions\ratio_lag_correlations.csv'
    dbms=csv 
    replace;
 *run;
@@ -927,20 +935,21 @@ run;
 *by year;
 *output out=s6 sum()=;
 *run;
+/*
 **************Adding final year q1 catches*******************;
 
 data s6;
 set s5;
-if year=2018 then ton=.;
-if year=2018 then n0=0;
-if year=2018 then n1=0;
-if year=2018 then n2=0;
-if year=2018 then n3=0;
-if year=2018 then n4=0;
+if year=2019 then ton=.;
+if year=2019 then n0=0;
+if year=2019 then n1=0;
+if year=2019 then n2=0;
+if year=2019 then n3=0;
+if year=2019 then n4=0;
 run;
 
 data s7;
-set s6;
+set s6;/*
 q12=0;
 q34=0;
 if quarter=1 then q12=ton;
@@ -1011,10 +1020,9 @@ if year=2018 and quarter=1 then n3=n3last;
 if year=2018 and quarter=1 then n4=n4last;
 run;
 
-
 ********SOP korrektion af mw***************************************************;
 data m25;
-set s13;
+set s5;
 if quarter in (1,2) then sopcorr=ton/(n1*mw1+n2*mw2+n3*mw3+n4*mw4);
 if quarter in (3,4) then sopcorr=ton/(n0*mw0+n1*mw1+n2*mw2+n3*mw3+n4*mw4);
 if ton=0 then sopcorr=1;
@@ -1030,16 +1038,15 @@ keep year quarter n0-n4 mw0-mw4 ton n_samples div;
 run;
 
 data m26;
-set s13;
+set s5;
 if quarter in (1,2) then sopcorr=ton/(n1*mw1+n2*mw2+n3*mw3+n4*mw4);
 if quarter in (3,4) then sopcorr=ton/(n0*mw0+n1*mw1+n2*mw2+n3*mw3+n4*mw4);
 if ton=0 then sopcorr=1;
 
-mw0=sopcorr*mw0;
-mw1=sopcorr*mw1;
-mw2=sopcorr*mw2;
-mw3=sopcorr*mw3;
-mw4=sopcorr*mw4;
+if quarter ne 2 then mw1=sopcorr*mw1;
+if quarter ne 2 then mw2=sopcorr*mw2;
+if quarter ne 2 then mw3=sopcorr*mw3;
+if quarter ne 2 then mw4=sopcorr*mw4;
 *if year lt 1991 then delete;
 if quarter=. then delete;
 sop=n0*mw0+n1*mw1+n2*mw2+n3*mw3+n4*mw4;
@@ -1049,7 +1056,6 @@ wmw1=n1*mw1;
 wmw2=n2*mw2;
 wmw3=n3*mw3;
 wmw4=n4*mw4;
-if quarter=2 then wmw0=mw0;
 if quarter=2 then wmw1=mw1;
 if quarter=2 then wmw2=mw2;
 if quarter=2 then wmw3=mw3;
@@ -1065,23 +1071,27 @@ run;
 proc summary data=m26;
 var n_samples n0-n4 wmw0-wmw4 ton;
 by div year quarter;
-output out=m27 sum()=;
+output out=m27 sum()= mean(wmw1)=w2mw1 mean(wmw2)=w2mw2 mean(wmw3)=w2mw3 mean(wmw4)=w2mw4;
 run;
 
 data m28;
 set m27;
-if year ne 2018 then mw0=wmw0/n0;
-if year ne 2018 then mw1=wmw1/n1;
-if year ne 2018 then mw2=wmw2/n2;
-if year ne 2018 then mw3=wmw3/n3;
-if year ne 2018 then mw4=wmw4/n4;
-if quarter=2 then mw0=wmw0;
-if quarter=2 then mw1=wmw1;
-if quarter=2 then mw2=wmw2;
-if quarter=2 then mw3=wmw3;
-if quarter=2 then mw4=wmw4;
+if year ne 2020 then mw0=wmw0/n0;
+if year ne 2020 then mw1=wmw1/n1;
+if year ne 2020 then mw2=wmw2/n2;
+if year ne 2020 then mw3=wmw3/n3;
+if year ne 2020 then mw4=wmw4/n4;
+if quarter=2 then mw1=w2mw1;
+if quarter=2 then mw2=w2mw2;
+if quarter=2 then mw3=w2mw3;
+if quarter=2 then mw4=w2mw4;
+*if quarter=2 then mw0=wmw0;
+*if quarter=2 then mw1=wmw1;
+*if quarter=2 then mw2=wmw2;
+*if quarter=2 then mw3=wmw3;
+*if quarter=2 then mw4=wmw4;
 *if year lt 1982 then delete;
-keep year quarter n0-n4 mw0-mw4 ton n_samples div;
+*keep year quarter n0-n4 mw0-mw4 ton n_samples div;
 run;
 
 proc sort data=m28;
@@ -1101,21 +1111,21 @@ run;
 
 data m31;
 set m30;
-if year=2018 then mw0=.;
-if year=2018 then mw1=.;
-if year=2018 then mw2=.;
-if year=2018 then mw3=.;
-if year=2018 then mw4=.;
+*if year=2018 then mw0=.;
+*if year=2018 then mw1=.;
+*if year=2018 then mw2=.;
+*if year=2018 then mw3=.;
+*if year=2018 then mw4=.;
 if mw0=. then mw0=mmw0;
 if mw1=. then mw1=mmw1;
 if mw2=. then mw2=mmw2;
 if mw3=. then mw3=mmw3;
 if mw4=. then mw4=mmw4;
-sop2017=ton/(n1*mw1+n2*mw2+n3*mw3+n4*mw4);
-if year=2018 then n1=n1*sop2017;
-if year=2018 then n2=n2*sop2017;
-if year=2018 then n3=n3*sop2017;
-if year=2018 then n4=n4*sop2017;
+*sop2017=ton/(n1*mw1+n2*mw2+n3*mw3+n4*mw4);
+*if year=2018 then n1=n1*sop2017;
+*if year=2018 then n2=n2*sop2017;
+*if year=2018 then n3=n3*sop2017;
+*if year=2018 then n4=n4*sop2017;
 keep year quarter n0-n4 mw0-mw4 ton n_samples div;
 run;
 /*
@@ -1135,7 +1145,7 @@ symbol5 v=plus i=join c=red;
 run;
 
 ******Eksporter csv**;
-*/
+
 proc sort data=m31;
 by div year quarter;
 run;
@@ -1146,7 +1156,7 @@ if div ne 'IV' then delete;
 run;
 
 proc export data=miv
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\Total_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv'
+   outfile='c:\ar\sprat\age_distributions\Total_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2_2019.csv'
    dbms=csv 
    replace;
 run;
@@ -1159,15 +1169,15 @@ if year lt 1974 then delete;
 run;
 
 proc export data=miiia
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\Total_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2.csv'
+   outfile='c:\ar\sprat\age_distributions\Total_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2_2019.csv'
    dbms=csv 
    replace;
 run;
 quit;
 
-
+*/
 data m26;
-set s13;
+set s5;
 if quarter in (1,2) then sopcorr=ton/(n1*mw1+n2*mw2+n3*mw3+n4*mw4);
 if quarter in (3,4) then sopcorr=ton/(n0*mw0+n1*mw1+n2*mw2+n3*mw3+n4*mw4);
 if ton=0 then sopcorr=1;
@@ -1218,26 +1228,26 @@ run;
 proc summary data=m26;
 var n_samples n0-n3 wmw0-wmw3 ton;
 by div year quarter;
-output out=m27 sum()=;
+output out=m27 sum()= mean(wmw1)=w2mw1 mean(wmw2)=w2mw2 mean(wmw3)=w2mw3 mean(wmw0)=w2mw0;
 run;
 
 data m28;
 set m27;
-if year lt 2017 then mw0=wmw0/n0;
-if year lt 2017 then mw1=wmw1/n1;
-if year lt 2017 then mw2=wmw2/n2;
-if year lt 2017 then mw3=wmw3/n3;
+if year lt 2021 then mw0=wmw0/n0;
+if year lt 2021 then mw1=wmw1/n1;
+if year lt 2021 then mw2=wmw2/n2;
+if year lt 2021 then mw3=wmw3/n3;
 if quarter in (1,2) then  mw0=wmw0/n0;
 if quarter in (1,2) then  mw1=wmw1/n1;
 if quarter in (1,2) then  mw2=wmw2/n2;
 if quarter in (1,2) then  mw3=wmw3/n3;
-if quarter in (4) then  mw0=wmw0;
-if quarter in (4) then  mw1=wmw1;
-if quarter in (4) then  mw2=wmw2;
-if quarter in (4) then  mw3=wmw3;
-if quarter in (4) then  mw4=wmw4;
+if quarter in (4) then  mw0=w2mw0;
+if quarter in (4) then  mw1=w2mw1;
+if quarter in (4) then  mw2=w2mw2;
+if quarter in (4) then  mw3=w2mw3;
+if quarter in (4) then  mw4=w2mw4;
 *if year lt 1982 then delete;
-keep year quarter n0-n3 mw0-mw3 ton n_samples div;
+*keep year quarter n0-n3 mw0-mw3 ton n_samples div;
 run;
 
 proc sort data=m28;
@@ -1257,25 +1267,25 @@ run;
 
 data m31;
 set m30;
-if year=2017 and quarter=3 then mw0=.;
-if year=2017 and quarter=3  then mw1=.;
-if year=2017 and quarter=3  then mw2=.;
-if year=2017 and quarter=3  then mw3=.;
+*if year=2020 and quarter=3 then mw0=.;
+*if year=2020 and quarter=3  then mw1=.;
+*if year=2020 and quarter=3  then mw2=.;
+*if year=2020 and quarter=3  then mw3=.;
 if mw0=. then mw0=mmw0;
 if mw1=. then mw1=mmw1;
 if mw2=. then mw2=mmw2;
 if mw3=. then mw3=mmw3;
-sop2017=ton/(n0*mw0+n1*mw1+n2*mw2+n3*mw3);
-if year=2017 and quarter=3  then n0=n0*sop2017;
-if year=2017 and quarter=3  then n1=n1*sop2017;
-if year=2017 and quarter=3  then n2=n2*sop2017;
-if year=2017 and quarter=3  then n3=n3*sop2017;
+*sop2017=ton/(n0*mw0+n1*mw1+n2*mw2+n3*mw3);
+*if year=2017 and quarter=3  then n0=n0*sop2017;
+*if year=2017 and quarter=3  then n1=n1*sop2017;
+*if year=2017 and quarter=3  then n2=n2*sop2017;
+*if year=2017 and quarter=3  then n3=n3*sop2017;
 nperton0=n0/ton;
 nperton1=n1/ton;
 nperton2=n2/ton;
 nperton3=n3/ton;
 if div='NO' and year lt 1974 then delete;
-*keep year  n0-n4 mw0-mw4 ton n_samples div;
+keep year quarter n0-n4 mw0-mw4 ton n_samples div;
 run;
 
 proc sort data=m31;
@@ -1305,7 +1315,7 @@ if div ne 'IV' then delete;
 run;
 
 proc export data=miv
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_IV_no_Q2.csv'
+   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_IV.csv'
    dbms=csv 
    replace;
 run;
@@ -1318,7 +1328,7 @@ if year lt 1974 then delete;
 run;
 
 proc export data=miiia
-   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_NO_no_Q2.csv'
+   outfile='C:\Users\kibi\OneDrive - Danmarks Tekniske Universitet\gits\spr.27.3a4_commercial_catch\output\01_benchmark_2018_2025_rerun\July_to_june_quarterly_catch_in_numbers_and_mean_weight_benchmark_NO.csv'
    dbms=csv 
    replace;
 run;

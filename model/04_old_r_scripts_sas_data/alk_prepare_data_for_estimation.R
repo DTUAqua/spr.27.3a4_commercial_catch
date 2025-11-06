@@ -1,5 +1,4 @@
-
-prepare_data_for_est <- function(path_data, data_rca, data_rhh, tab_space, tab_time, time_first, space_first, specie, type_length, ages, years, recruit_month,
+alk_prepare_data_for_estimation <- function(path_data, data_rca, data_rhh, tab_space, tab_time, time_first, space_first, specie, type_length, ages, years, recruit_month,
                                    length_pred, length_obs ){
   
   # ------------------------------- ##

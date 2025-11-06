@@ -26,8 +26,9 @@ f_length_distri <- function(path_data, data_all, data_ALK, path_graph, tab_level
   }
   
   #### Part 1 ####
-  setwd(path_data)
-  l1 <- read.csv(data_all)
+  l1 <- data_all
+  l1 <- rename(l1, rect = intsq, staNum = sampleId)
+  l1 <- select(l1, -area, -area2 ,-area3)
   
   # # Import 
   # # RDB - Danish
@@ -73,7 +74,11 @@ f_length_distri <- function(path_data, data_all, data_ALK, path_graph, tab_level
   # }
   
   # Select years and only samples >= 25
-  l1 <- subset(l1, year %in% years & subSampNo >= 25 & is.na(rect) == F & rect != "")
+  l10 <- l1 %>%
+    group_by(year, quarter, rect, sampleId) %>%
+    summarise(subSampNo = sum(number, na.rm = TRUE), .groups = "drop")
+  
+  l1_0 <- subset(l1, year %in% years & is.na(rect) == F & rect != "")  #& subSampNo >= 25
   
   # Get areas
   l1 <- merge(l1, tab_space, all.x = TRUE, by = "rect")
@@ -94,7 +99,7 @@ f_length_distri <- function(path_data, data_all, data_ALK, path_graph, tab_level
   l2$m_vgt[l2$m_vgt == 0] <- NA
   
   # Create graph 1
-  f_graph1(data_graph = l2, path_graph = path_graph)
+  # f_graph1(data_graph = l2, path_graph = path_graph)
   
     # Get the number of samples - wrong
   l2 <- l2[!duplicated(l2[,c("year", time_first, "rect", "day", "staNum")]),]
@@ -105,14 +110,13 @@ f_length_distri <- function(path_data, data_all, data_ALK, path_graph, tab_level
   
   
   # Group by sample
-  eval(parse(text=paste0("l4 <- l1 %>% group_by(year,",time_first, ", rect, sampType, landCtry, vslFlgCtry, proj, trpCode, staNum, subSampNo, length) %>% summarize_at(.vars = vars(vgt, number), .funs = sum)")))
-  l4$lnl <- with(l4, log(length))
-  l4$m_vgt <- with(l4, vgt/number) 
+  # eval(parse(text=paste0("l4 <- l1 %>% group_by(year,",time_first, ", rect, sampleId, length) %>% summarize_at(.vars = vars(vgt, number), .funs = sum)")))
+  # l4$lnl <- with(l4, log(length))
+  # l4$m_vgt <- with(l4, vgt/number) 
   
-  l4$m_vgt[l4$m_vgt == 0] <- NA
+  l1$m_vgt[l1$m_vgt == 0] <- NA
   
-  l4 <- data.frame(ungroup(l4))
-  
+  l4 <- data.frame(ungroup(l1))
   #### Part 2 ####
   
   # GLM - Eliminate extreme weights
@@ -192,11 +196,17 @@ f_length_distri <- function(path_data, data_all, data_ALK, path_graph, tab_level
   
   # GLM by year & month (or quarter)
   # Get 2 datasets : one with NAs for m_vgt, the other without NAs
-  l7 <- split(l6c, list(l6c$year, eval(parse(text=paste0('l6c$', time_first)))))
-  l7_a <- lapply(l7, function (x) {subset(x, is.na(m_vgt) == FALSE)}) #withoutNA
-  l7_b <- lapply(l7, function (x) {subset(x, is.na(m_vgt) == TRUE)}) #withNA
   
+  l7 <- split(l6c, list(l6c$year, l6c[[time_first]])) # Split the data
+  l7_a <- lapply(l7, function(x) subset(x, !is.na(m_vgt))) # Filter rows without NA in m_vgt
+  l7_b <- lapply(l7, function(x) subset(x, is.na(m_vgt)))  # Filter rows with NA in m_vgt
+  
+  l6c_in <- l6c[ , c("year", time_first, "length", "m_vgt", "lnl")]
+  l7_in <- split(l6c_in, list(l6c$year, l6c[[time_first]])) # Split the data
+  l7_a <- lapply(l7_in, function(x) subset(x, !is.na(m_vgt))) # Filter rows without NA in m_vgt
+  l7_a <- l7_a[sapply(l7_a, nrow) > 0] # Remove empty subsets from l7_a
   # GLM
+  
   m2 <- lapply(l7_a, function (x) {glm(m_vgt ~ lnl, family = Gamma(link = "log"), data = x)})
   
   # Get predictions
@@ -205,6 +215,20 @@ f_length_distri <- function(path_data, data_all, data_ALK, path_graph, tab_level
     preds_a[[i]] <- m2[[i]]$fitted.values
     l7_b[[i]]$pred <- predict(m2[[i]], newdata = l7_b[[i]], type = 'response')
   }
+  # Get the union of all column names across the data frames
+  all_columns <- unique(unlist(lapply(l7_b, colnames)))
+  
+  # Standardize each data frame to have the same columns
+  l7_b <- lapply(l7_b, function(df) {
+    if (nrow(df) > 0) {
+      missing_cols <- setdiff(all_columns, colnames(df))
+      for (col in missing_cols) {
+        df[[col]] <- NA
+      }
+      df <- df[, all_columns]
+    }
+    return(df)
+  })
   
   # Join predictions and datasets with no NAs
   l7_c <- do.call(rbind,l7_a)
@@ -213,13 +237,14 @@ f_length_distri <- function(path_data, data_all, data_ALK, path_graph, tab_level
   
   # Unlist data with NA and bind them to the rest
   l7_d <- do.call(rbind, l7_b)
-  l8 <- rbind.fill(l8, l7_d)
+  l8 <- plyr::rbind.fill(l8, l7_d)
   
   # Get preds by year, month(quarter) and length
+  # l8 <- subset(l8, !(is.na(pred)))
   l8a <- l8[!duplicated(l8[,c("year", time_first, "length", "pred")]),]
   
   # Merge it with l6c
-  l8b <- merge(l6c, l8a[,c("year", time_first, "length", "pred")], all.x = TRUE, by = c("year", time_first, "length"))
+  l8b <- left_join(l6c, l8a[,c("year", time_first, "length", "pred")], by = c("year", time_first, "length"))
   
   # Correcting weight if out of limits
   l8b[is.na(l8b$m_vgt) == TRUE, "vgt"] <- with(l8b[is.na(l8b$m_vgt) == TRUE, ], number*pred) 

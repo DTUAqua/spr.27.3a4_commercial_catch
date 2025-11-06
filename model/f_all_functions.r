@@ -592,7 +592,7 @@ f_ALK_nostrat <- function(ages, levels, years, areas, list_lvl, specie, length_p
       eval(parse(text=paste0('l11$s_fish', a, '[is.na(l11$s_fish', a, ') == T] <- 0')))
     }
     # Attribute the level and probabilty to each combination
-    eval(parse(text=paste0("l12 <- l11 %>% group_by(rect, ", time_first, ", length) %>% 
+    eval(parse(text=paste0("l12 <- l11 %>% group_by(rect, ", time_first, ", length) %>%  # add year
                            summarize_at(.vars = vars(", text_max, "), .funs = max)")))
     
     # Rep for each age : careful case where age_min = 0
@@ -667,7 +667,7 @@ f_ALK_nostrat <- function(ages, levels, years, areas, list_lvl, specie, length_p
       }
     }
     
-    eval(parse(text=paste0("l14 <- l13 %>% group_by(rect, ", time_first, ", length) %>% 
+    eval(parse(text=paste0("l14 <- l13 %>% group_by(rect, ", time_first, ", length) %>%  # add year
                            summarize_at(.vars = vars(", paste(paste(text_p, collapse = ", "), paste(text_l, collapse = ", "), 
                                                               paste(text_pi, collapse = ", "), paste(text_var, collapse = ", "),
                                                               paste(text_s_fish, collapse = ", "), sep = ", "), "), .funs = max)")))    
@@ -1093,10 +1093,19 @@ f_compute_ALK <- function(path_data, data_rca, data_rhh, tab_levels, tab_space, 
                                     stratif = stratif)
   }
   
+  pre_key_sas <- haven::read_sas("C:/Users/kibi/OneDrive - Danmarks Tekniske Universitet/gits/spr.27.3a4_commercial_catch/output/01_benchmark_2018_2025_rerun/in5.sas7bdat")
+  
+  pre_key_sas <- dplyr::rename(pre_key_sas, length = scm, area1 = area)
+  pre_key_sas$halfyear <- 2
+  pre_key_sas$halfyear[pre_key_sas$quarter %in% c(1,2)] <- 1
+  
+  dplyr::distinct(pre_key, quarter, halfyear)
+  pre_key_sas <- select(pre_key_sas, -`_FREQ_`, -`_TYPE_`)
+  
   # ALK by level
   list_lvl <- list()
   for(l in levels[1]:levels[2]){
-    eval(parse(text=paste0('list_lvl$lv',l,'<- f_levels_ALK(pre_key = pre_key,
+    eval(parse(text=paste0('list_lvl$lv',l,'<- f_levels_ALK(pre_key = pre_key_sas,
                            lvl = ',l,', 
                            ages = ages, 
                            tab_levels = tab_levels, 
